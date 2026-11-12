@@ -1,0 +1,1445 @@
+{
+  "tag": "improved",
+  "pkg": null,
+  "db": "/mnt/sdb/tmp_hou/tmp_lqs/ctf-kb/data/ctf-kb.sqlite",
+  "db_bytes": 260575232,
+  "repeat": 5,
+  "warmup": 1,
+  "timing_note": "perf_counter，含 lookup_cve 详情组装；每查询重复 median",
+  "metrics": {
+    "n_queries": 28,
+    "n_scored": 20,
+    "recall_at_5": 1.0,
+    "mrr": 1.0,
+    "mismatch_rate": 0.0,
+    "mismatch_count": 0,
+    "mismatch_denom": 7,
+    "empty_ok": 4,
+    "empty_fail": 0,
+    "fts_errors": 0,
+    "latency_ms": {
+      "p50": 12.749306159093976,
+      "p95": 17.291043093428016,
+      "max": 21.326400339603424,
+      "mean": 10.821548124243106,
+      "n": 28
+    },
+    "avg_json_bytes": 5470.571428571428,
+    "avg_result_count": 2.8214285714285716
+  },
+  "rows": [
+    {
+      "query": "CVE-2021-42013",
+      "ids": [
+        "CVE-2021-42013"
+      ],
+      "count": 1,
+      "product": null,
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 0.5070087499916553,
+      "json_bytes": 3414,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "查询包含 CVE ID CVE-2021-42013"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-22"
+      ],
+      "elapsed_all_ms": [
+        0.5010878667235374,
+        0.5212961696088314,
+        0.5005868151783943,
+        0.5070087499916553,
+        0.5151149816811085
+      ],
+      "case_id": "id-42013",
+      "query_type": "cve_id",
+      "relevant": [
+        "CVE-2021-42013"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "CVE-2017-5638",
+      "ids": [
+        "CVE-2017-5638"
+      ],
+      "count": 1,
+      "product": null,
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 0.5325973033905029,
+      "json_bytes": 2857,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "查询包含 CVE ID CVE-2017-5638"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-20"
+      ],
+      "elapsed_all_ms": [
+        0.6325538270175457,
+        0.5325973033905029,
+        0.5323369987308979,
+        0.5275681614875793,
+        0.5635647103190422
+      ],
+      "case_id": "id-5638",
+      "query_type": "cve_id",
+      "relevant": [
+        "CVE-2017-5638"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "CVE-2021-44228",
+      "ids": [
+        "CVE-2021-44228"
+      ],
+      "count": 1,
+      "product": null,
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 1.2496290728449821,
+      "json_bytes": 3410,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "查询包含 CVE ID CVE-2021-44228"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-917"
+      ],
+      "elapsed_all_ms": [
+        1.6415729187428951,
+        1.2540975585579872,
+        1.2361351400613785,
+        1.2426371686160564,
+        1.2496290728449821
+      ],
+      "case_id": "id-44228",
+      "query_type": "cve_id",
+      "relevant": [
+        "CVE-2021-44228"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "CVE-2014-6271",
+      "ids": [
+        "CVE-2014-6271"
+      ],
+      "count": 1,
+      "product": null,
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 0.6378539837896824,
+      "json_bytes": 3095,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "查询包含 CVE ID CVE-2014-6271"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-78"
+      ],
+      "elapsed_all_ms": [
+        0.6550070829689503,
+        0.6306106224656105,
+        0.639698002487421,
+        0.6378539837896824,
+        0.6373226642608643
+      ],
+      "case_id": "id-6271",
+      "query_type": "cve_id",
+      "relevant": [
+        "CVE-2014-6271"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "CVE-2014-0160",
+      "ids": [
+        "CVE-2014-0160"
+      ],
+      "count": 1,
+      "product": null,
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 0.46814605593681335,
+      "json_bytes": 2335,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "查询包含 CVE ID CVE-2014-0160"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        null
+      ],
+      "elapsed_all_ms": [
+        0.4946459084749222,
+        0.4671439528465271,
+        0.46814605593681335,
+        0.46704523265361786,
+        0.4805303178727627
+      ],
+      "case_id": "id-0160",
+      "query_type": "cve_id",
+      "relevant": [
+        "CVE-2014-0160"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Apache HTTP Server 2.4.50",
+      "ids": [
+        "CVE-2021-42013",
+        "CVE-2021-40438",
+        "CVE-2024-38475",
+        "CVE-2019-0211",
+        "CVE-2021-44790"
+      ],
+      "count": 5,
+      "product": "Apache HTTP Server",
+      "version": "2.4.50",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 17.29234727099538,
+      "json_bytes": 9723,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"HTTP\" AND \"Server\" AND \"2.4.50\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache HTTP Server；版本适用性=affected",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown"
+      ],
+      "version_status": [
+        "affected",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-22",
+        "CWE-918",
+        "CWE-116",
+        null,
+        "CWE-120"
+      ],
+      "elapsed_all_ms": [
+        19.489220809191465,
+        17.293309327214956,
+        17.29234727099538,
+        17.270356882363558,
+        17.252243123948574
+      ],
+      "case_id": "pv-httpd-2450",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2021-42013"
+      ],
+      "excluded": [
+        "CVE-2021-41773"
+      ],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Apache HTTP Server 2.4.49",
+      "ids": [
+        "CVE-2021-41773",
+        "CVE-2021-42013",
+        "CVE-2021-40438",
+        "CVE-2024-38475",
+        "CVE-2019-0211"
+      ],
+      "count": 5,
+      "product": "Apache HTTP Server",
+      "version": "2.4.49",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 17.280563712120056,
+      "json_bytes": 10978,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"HTTP\" AND \"Server\" AND \"2.4.49\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache HTTP Server；版本适用性=affected",
+        "产品字段匹配 Apache HTTP Server；版本适用性=affected",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown"
+      ],
+      "version_status": [
+        "affected",
+        "affected",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-22",
+        "CWE-22",
+        "CWE-918",
+        "CWE-116",
+        null
+      ],
+      "elapsed_all_ms": [
+        17.39529985934496,
+        17.2122772783041,
+        17.280563712120056,
+        17.339596059173346,
+        17.232134006917477
+      ],
+      "case_id": "pv-httpd-2449",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2021-41773",
+        "CVE-2021-42013"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Apache Struts 2.5.9",
+      "ids": [
+        "CVE-2017-5638",
+        "CVE-2018-11776",
+        "CVE-2017-9805",
+        "CVE-2017-9791",
+        "CVE-2020-17530"
+      ],
+      "count": 5,
+      "product": "Apache Struts",
+      "version": "2.5.9",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 15.452092979103327,
+      "json_bytes": 10063,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"Struts\" AND \"2.5.9\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache Struts；版本适用性=affected",
+        "产品字段匹配 Apache Struts；版本适用性=unknown",
+        "产品字段匹配 Apache Struts；版本适用性=unknown",
+        "产品字段匹配 Apache Struts；版本适用性=unknown",
+        "产品字段匹配 Apache Struts；版本适用性=unknown"
+      ],
+      "version_status": [
+        "affected",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-20",
+        "CWE-20",
+        "CWE-502",
+        "CWE-20",
+        "CWE-917"
+      ],
+      "elapsed_all_ms": [
+        15.452092979103327,
+        15.431343112140894,
+        15.509658958762884,
+        15.471427701413631,
+        15.428868122398853
+      ],
+      "case_id": "pv-struts-259",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2017-5638"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Apache Log4j2 2.14.1",
+      "ids": [
+        "CVE-2021-44228",
+        "CVE-2021-45105",
+        "CVE-2021-44832"
+      ],
+      "count": 3,
+      "product": "Apache Log4j2",
+      "version": "2.14.1",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 13.6682721786201,
+      "json_bytes": 6465,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"Log4j2\" AND \"2.14.1\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache Log4j2；版本适用性=affected",
+        "产品字段匹配 Apache Log4j2；版本适用性=unknown",
+        "产品字段匹配 Apache Log4j2；版本适用性=unknown"
+      ],
+      "version_status": [
+        "affected",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-917",
+        "CWE-917",
+        "CWE-917"
+      ],
+      "elapsed_all_ms": [
+        13.6682721786201,
+        13.597869779914618,
+        13.636913150548935,
+        13.67664709687233,
+        13.668813277035952
+      ],
+      "case_id": "pv-log4j-2141",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2021-44228"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Drupal 8.5.0",
+      "ids": [
+        "CVE-2018-7600",
+        "CVE-2019-6340",
+        "CVE-2026-9082",
+        "CVE-2020-13671",
+        "CVE-2019-6339"
+      ],
+      "count": 5,
+      "product": "Drupal",
+      "version": "8.5.0",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 14.57180269062519,
+      "json_bytes": 9170,
+      "fts": {
+        "fts_query": "\"Drupal\" AND \"8.5.0\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Drupal before 7.58, 8.x before 8.3.9, 8.4.x before 8.4.6, and 8.5.x before 8.5.1；版本适用性=affected",
+        "产品字段匹配 Drupal Core；版本适用性=unknown",
+        "产品字段匹配 Drupal core；版本适用性=unknown",
+        "产品字段匹配 Drupal Core；版本适用性=unknown",
+        "产品字段匹配 Drupal core；版本适用性=unknown"
+      ],
+      "version_status": [
+        "affected",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-20",
+        "CWE-502",
+        "CWE-89",
+        null,
+        null
+      ],
+      "elapsed_all_ms": [
+        14.536597300320864,
+        14.599204994738102,
+        14.578445814549923,
+        14.552135951817036,
+        14.57180269062519
+      ],
+      "case_id": "pv-drupal-850",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2018-7600"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Spring Cloud Gateway 3.1.0",
+      "ids": [
+        "CVE-2022-22947"
+      ],
+      "count": 1,
+      "product": "Spring Cloud Gateway",
+      "version": "3.1.0",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 13.199314009398222,
+      "json_bytes": 2604,
+      "fts": {
+        "fts_query": "\"Spring\" AND \"Cloud\" AND \"Gateway\" AND \"3.1.0\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Spring Cloud Gateway；版本适用性=affected"
+      ],
+      "version_status": [
+        "affected"
+      ],
+      "cwes": [
+        "CWE-94"
+      ],
+      "elapsed_all_ms": [
+        13.199314009398222,
+        13.253385201096535,
+        13.220974244177341,
+        13.09750322252512,
+        13.09301471337676
+      ],
+      "case_id": "pv-scg-310",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2022-22947"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "OpenSSL 1.0.1f",
+      "ids": [
+        "CVE-2014-0160",
+        "CVE-2022-2068",
+        "CVE-2022-3786",
+        "CVE-2022-3602",
+        "CVE-2022-1292"
+      ],
+      "count": 5,
+      "product": "OpenSSL",
+      "version": "1.0.1f",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 21.326400339603424,
+      "json_bytes": 7935,
+      "fts": {
+        "fts_query": "\"OpenSSL\" AND \"1.0.1f\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "精选版本范围匹配产品 OpenSSL；版本适用性=affected",
+        "产品字段匹配 OpenSSL；版本适用性=unknown",
+        "产品字段匹配 OpenSSL；版本适用性=unknown",
+        "产品字段匹配 OpenSSL；版本适用性=unknown",
+        "产品字段匹配 OpenSSL；版本适用性=unknown"
+      ],
+      "version_status": [
+        "affected",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        null,
+        "CWE-77",
+        "CWE-120",
+        "CWE-120",
+        "CWE-77"
+      ],
+      "elapsed_all_ms": [
+        21.396182011812925,
+        21.253885235637426,
+        21.215292159467936,
+        21.651178132742643,
+        21.326400339603424
+      ],
+      "case_id": "pv-openssl-101f",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2014-0160"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "GNU Bash 4.3",
+      "ids": [
+        "CVE-2014-6271",
+        "CVE-2014-7186",
+        "CVE-2014-7187",
+        "CVE-2014-6278",
+        "CVE-2014-7169"
+      ],
+      "count": 5,
+      "product": "GNU Bash",
+      "version": "4.3",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 14.384642709046602,
+      "json_bytes": 8850,
+      "fts": {
+        "fts_query": "\"GNU\" AND \"Bash\" AND \"4.3\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "精选版本范围匹配产品 GNU Bash；版本适用性=affected",
+        "全文检索匹配 'GNU Bash 4.3'；版本适用性=unknown",
+        "全文检索匹配 'GNU Bash 4.3'；版本适用性=unknown",
+        "全文检索匹配 'GNU Bash 4.3'；版本适用性=unknown",
+        "全文检索匹配 'GNU Bash 4.3'；版本适用性=unknown"
+      ],
+      "version_status": [
+        "affected",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-78",
+        null,
+        null,
+        null,
+        null
+      ],
+      "elapsed_all_ms": [
+        14.384642709046602,
+        14.365436043590307,
+        14.387048315256834,
+        14.328217133879662,
+        14.390864409506321
+      ],
+      "case_id": "pv-bash-43",
+      "query_type": "product_version",
+      "relevant": [
+        "CVE-2014-6271"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Apache HTTP Server 2.4.51",
+      "ids": [
+        "CVE-2021-40438",
+        "CVE-2024-38475",
+        "CVE-2019-0211",
+        "CVE-2021-44790",
+        "CVE-2017-9798"
+      ],
+      "count": 5,
+      "product": "Apache HTTP Server",
+      "version": "2.4.51",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 17.274524085223675,
+      "json_bytes": 8487,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"HTTP\" AND \"Server\" AND \"2.4.51\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-918",
+        "CWE-116",
+        null,
+        "CWE-120",
+        null
+      ],
+      "elapsed_all_ms": [
+        17.25389575585723,
+        17.312625888735056,
+        17.326510976999998,
+        17.1916582621634,
+        17.274524085223675
+      ],
+      "case_id": "na-httpd-2451",
+      "query_type": "product_version_not_affected",
+      "relevant": [],
+      "excluded": [
+        "CVE-2021-42013",
+        "CVE-2021-41773"
+      ],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "Apache Struts 2.5.12",
+      "ids": [
+        "CVE-2018-11776",
+        "CVE-2017-9805",
+        "CVE-2017-9791",
+        "CVE-2020-17530",
+        "CVE-2019-0230"
+      ],
+      "count": 5,
+      "product": "Apache Struts",
+      "version": "2.5.12",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 15.450740233063698,
+      "json_bytes": 9414,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"Struts\" AND \"2.5.12\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache Struts；版本适用性=unknown",
+        "产品字段匹配 Apache Struts；版本适用性=unknown",
+        "产品字段匹配 Apache Struts；版本适用性=unknown",
+        "产品字段匹配 Apache Struts；版本适用性=unknown",
+        "产品字段匹配 Apache Struts；版本适用性=unknown"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-20",
+        "CWE-502",
+        "CWE-20",
+        "CWE-917",
+        "CWE-1321"
+      ],
+      "elapsed_all_ms": [
+        15.450740233063698,
+        15.456910710781813,
+        15.442533884197474,
+        15.378803946077824,
+        15.452682971954346
+      ],
+      "case_id": "na-struts-2512",
+      "query_type": "product_version_not_affected",
+      "relevant": [],
+      "excluded": [
+        "CVE-2017-5638"
+      ],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "Apache HTTP Server 2.4.5",
+      "ids": [
+        "CVE-2021-40438",
+        "CVE-2024-38475",
+        "CVE-2019-0211",
+        "CVE-2021-44790",
+        "CVE-2017-9798"
+      ],
+      "count": 5,
+      "product": "Apache HTTP Server",
+      "version": "2.4.5",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 17.288621049374342,
+      "json_bytes": 8485,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"HTTP\" AND \"Server\" AND \"2.4.5\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown",
+        "产品字段匹配 Apache HTTP Server；版本适用性=unknown"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-918",
+        "CWE-116",
+        null,
+        "CWE-120",
+        null
+      ],
+      "elapsed_all_ms": [
+        17.304921057075262,
+        17.222225200384855,
+        17.35849119722843,
+        17.275905702263117,
+        17.288621049374342
+      ],
+      "case_id": "na-httpd-245",
+      "query_type": "product_version_not_affected",
+      "relevant": [],
+      "excluded": [
+        "CVE-2021-42013",
+        "CVE-2021-41773"
+      ],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "Apache Log4j2 2.17.1",
+      "ids": [
+        "CVE-2021-45105",
+        "CVE-2021-44832"
+      ],
+      "count": 2,
+      "product": "Apache Log4j2",
+      "version": "2.17.1",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 14.77617584168911,
+      "json_bytes": 3564,
+      "fts": {
+        "fts_query": "\"Apache\" AND \"Log4j2\" AND \"2.17.1\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 Apache Log4j2；版本适用性=unknown",
+        "产品字段匹配 Apache Log4j2；版本适用性=unknown"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-917",
+        "CWE-917"
+      ],
+      "elapsed_all_ms": [
+        14.765665866434574,
+        14.776746742427349,
+        14.77617584168911,
+        14.787436928600073,
+        14.763230923563242
+      ],
+      "case_id": "na-log4j-2171",
+      "query_type": "product_version_not_affected",
+      "relevant": [],
+      "excluded": [
+        "CVE-2021-44228"
+      ],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "PHP deserialization",
+      "ids": [
+        "CVE-2019-16894",
+        "CVE-2026-58025",
+        "CVE-2020-28032",
+        "CVE-2023-2288",
+        "CVE-2022-23940"
+      ],
+      "count": 5,
+      "product": null,
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 3.4742550924420357,
+      "json_bytes": 5982,
+      "fts": {
+        "fts_query": "\"PHP\" AND \"deserialization\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "全文检索匹配 'PHP deserialization'",
+        "全文检索匹配 'PHP deserialization'",
+        "全文检索匹配 'PHP deserialization'",
+        "全文检索匹配 'PHP deserialization'",
+        "全文检索匹配 'PHP deserialization'"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-89",
+        "CWE-502",
+        "CWE-502",
+        "CWE-502",
+        "CWE-502"
+      ],
+      "elapsed_all_ms": [
+        3.522555809468031,
+        3.467012196779251,
+        3.4742550924420357,
+        3.4489971585571766,
+        3.5527916625142097
+      ],
+      "case_id": "feat-php-deser",
+      "query_type": "feature",
+      "relevant": [],
+      "excluded": [],
+      "scored": false,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "CWE-22",
+      "ids": [
+        "CVE-2020-5902",
+        "CVE-2022-29464",
+        "CVE-2019-19781",
+        "CVE-2021-22005",
+        "CVE-2023-32315"
+      ],
+      "count": 5,
+      "product": null,
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 8.000549860298634,
+      "json_bytes": 10025,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "CWE 精确匹配 CWE-22",
+        "CWE 精确匹配 CWE-22",
+        "CWE 精确匹配 CWE-22",
+        "CWE 精确匹配 CWE-22",
+        "CWE 精确匹配 CWE-22"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-22",
+        "CWE-22",
+        "CWE-22",
+        "CWE-22",
+        "CWE-22"
+      ],
+      "elapsed_all_ms": [
+        8.463967125862837,
+        8.000549860298634,
+        7.95142725110054,
+        7.879332639276981,
+        8.264885284006596
+      ],
+      "case_id": "feat-cwe22",
+      "query_type": "cwe",
+      "relevant": [],
+      "excluded": [],
+      "scored": false,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "Log4Shell",
+      "ids": [
+        "CVE-2021-44228"
+      ],
+      "count": 1,
+      "product": "Log4Shell",
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 12.242201715707779,
+      "json_bytes": 3408,
+      "fts": {
+        "fts_query": "\"Log4Shell\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "全文检索匹配 'Log4Shell'"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-917"
+      ],
+      "elapsed_all_ms": [
+        12.23430735990405,
+        12.20768690109253,
+        12.246889993548393,
+        12.242201715707779,
+        12.338001281023026
+      ],
+      "case_id": "feat-log4shell",
+      "query_type": "feature",
+      "relevant": [
+        "CVE-2021-44228"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Shellshock",
+      "ids": [
+        "CVE-2014-6271"
+      ],
+      "count": 1,
+      "product": "Shellshock",
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 12.29929830878973,
+      "json_bytes": 3098,
+      "fts": {
+        "fts_query": "\"Shellshock\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "全文检索匹配 'Shellshock'"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-78"
+      ],
+      "elapsed_all_ms": [
+        12.28793803602457,
+        12.29929830878973,
+        12.254524976015091,
+        12.339171953499317,
+        12.357236817479134
+      ],
+      "case_id": "feat-shellshock",
+      "query_type": "feature",
+      "relevant": [
+        "CVE-2014-6271"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "Heartbleed",
+      "ids": [
+        "CVE-2014-0160"
+      ],
+      "count": 1,
+      "product": "Heartbleed",
+      "version": null,
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 10.75277291238308,
+      "json_bytes": 2338,
+      "fts": {
+        "fts_query": "\"Heartbleed\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "全文检索匹配 'Heartbleed'"
+      ],
+      "version_status": [
+        "unknown"
+      ],
+      "cwes": [
+        null
+      ],
+      "elapsed_all_ms": [
+        10.685586836189032,
+        10.75277291238308,
+        10.733617004007101,
+        10.771829169243574,
+        10.863990988582373
+      ],
+      "case_id": "feat-heartbleed",
+      "query_type": "feature",
+      "relevant": [
+        "CVE-2014-0160"
+      ],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": 1,
+      "mismatch": false
+    },
+    {
+      "query": "foo-bar",
+      "ids": [],
+      "count": 0,
+      "product": "foo-bar",
+      "version": null,
+      "status": "empty",
+      "error": null,
+      "elapsed_ms": 10.085504036396742,
+      "json_bytes": 549,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [],
+      "version_status": [],
+      "cwes": [],
+      "elapsed_all_ms": [
+        10.085504036396742,
+        10.116039775311947,
+        10.068743024021387,
+        10.077027603983879,
+        10.098336730152369
+      ],
+      "case_id": "syn-foobar",
+      "query_type": "syntax",
+      "relevant": [],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": true,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "OpenSSH 8.4",
+      "ids": [
+        "CVE-2026-123158",
+        "CVE-2025-26466",
+        "CVE-2025-26465",
+        "CVE-2025-61984",
+        "CVE-2026-35414"
+      ],
+      "count": 5,
+      "product": "OpenSSH",
+      "version": "8.4",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 13.4452641941607,
+      "json_bytes": 7417,
+      "fts": {
+        "fts_query": "\"OpenSSH\" AND \"8.4\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 OpenSSH；版本适用性=unknown",
+        "产品字段匹配 OpenSSH；版本适用性=unknown",
+        "产品字段匹配 OpenSSH；版本适用性=unknown",
+        "产品字段匹配 OpenSSH；版本适用性=unknown",
+        "产品字段匹配 OpenSSH；版本适用性=unknown"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-305",
+        null,
+        null,
+        null,
+        null
+      ],
+      "elapsed_all_ms": [
+        13.471062760800123,
+        13.4452641941607,
+        13.390210922807455,
+        13.454802334308624,
+        13.44412099570036
+      ],
+      "case_id": "syn-openssh",
+      "query_type": "syntax",
+      "relevant": [],
+      "excluded": [
+        "CVE-2024-6387"
+      ],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "nginx/1.18.0",
+      "ids": [
+        "CVE-2025-1974",
+        "CVE-2025-1098",
+        "CVE-2026-42945",
+        "CVE-2023-5044",
+        "CVE-2021-23017"
+      ],
+      "count": 5,
+      "product": "nginx",
+      "version": "1.18.0",
+      "status": "ok",
+      "error": null,
+      "elapsed_ms": 16.407981980592012,
+      "json_bytes": 7809,
+      "fts": {
+        "fts_query": "\"nginx\" AND \"1.18.0\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [
+        "产品字段匹配 ingress-nginx；版本适用性=unknown",
+        "产品字段匹配 ingress-nginx；版本适用性=unknown",
+        "产品字段匹配 NGINX Plus；版本适用性=unknown",
+        "产品字段匹配 ingress-nginx；版本适用性=unknown",
+        "产品字段匹配 Nginx Web Server, Nginx Plus；版本适用性=unknown"
+      ],
+      "version_status": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "cwes": [
+        "CWE-653",
+        "CWE-20",
+        "CWE-120",
+        "CWE-94",
+        null
+      ],
+      "elapsed_all_ms": [
+        16.407981980592012,
+        16.404985915869474,
+        16.35835785418749,
+        16.436724923551083,
+        16.60234620794654
+      ],
+      "case_id": "syn-nginx-slash",
+      "query_type": "syntax",
+      "relevant": [],
+      "excluded": [
+        "CVE-2017-7529"
+      ],
+      "scored": true,
+      "expect_empty": false,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "NonexistentSoft 9.9.9",
+      "ids": [],
+      "count": 0,
+      "product": "NonexistentSoft",
+      "version": "9.9.9",
+      "status": "empty",
+      "error": null,
+      "elapsed_ms": 11.245585978031158,
+      "json_bytes": 574,
+      "fts": {
+        "fts_query": "\"NonexistentSoft\" AND \"9.9.9\"",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [],
+      "version_status": [],
+      "cwes": [],
+      "elapsed_all_ms": [
+        11.237791273742914,
+        11.245585978031158,
+        11.276344303041697,
+        11.23780058696866,
+        11.278748046606779
+      ],
+      "case_id": "none-fake",
+      "query_type": "none",
+      "relevant": [],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": true,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "CVE-9999-0001",
+      "ids": [],
+      "count": 0,
+      "product": null,
+      "version": null,
+      "status": "empty",
+      "error": null,
+      "elapsed_ms": 0.021589919924736023,
+      "json_bytes": 550,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [],
+      "version_status": [],
+      "cwes": [],
+      "elapsed_all_ms": [
+        0.021589919924736023,
+        0.02108002081513405,
+        0.021709594875574112,
+        0.021220184862613678,
+        0.02199225127696991
+      ],
+      "case_id": "none-cve",
+      "query_type": "cve_id",
+      "relevant": [],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": true,
+      "hit_rank": null,
+      "mismatch": false
+    },
+    {
+      "query": "xyzzy-unknown-product",
+      "ids": [],
+      "count": 0,
+      "product": "xyzzy-unknown-product",
+      "version": null,
+      "status": "empty",
+      "error": null,
+      "elapsed_ms": 9.667611215263605,
+      "json_bytes": 577,
+      "fts": {
+        "fts_query": "",
+        "fts_error": null,
+        "fts_ok": true
+      },
+      "match_reasons": [],
+      "version_status": [],
+      "cwes": [],
+      "elapsed_all_ms": [
+        9.655538015067577,
+        9.72286518663168,
+        9.65086929500103,
+        9.667611215263605,
+        9.677278809249401
+      ],
+      "case_id": "none-xyzzy",
+      "query_type": "none",
+      "relevant": [],
+      "excluded": [],
+      "scored": true,
+      "expect_empty": true,
+      "hit_rank": null,
+      "mismatch": false
+    }
+  ]
+}

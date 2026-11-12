@@ -20,6 +20,7 @@ def render_search(payload: dict[str, Any]) -> str:
         f"CWE: {payload.get('cwe') or '-'}",
         f"版本提示: {payload.get('version') or '-'}",
         f"命中: {payload.get('count')}",
+        f"状态: {payload.get('status') or 'ok'}",
         "",
     ]
     for i, rec in enumerate(payload.get("results") or [], 1):
@@ -38,6 +39,12 @@ def render_search(payload: dict[str, Any]) -> str:
             )
         )
         lines.append(f"    匹配依据: {rec.get('match_reason')}")
+        vs = rec.get("version_status")
+        if vs:
+            extra = rec.get("version_evidence") or ""
+            lines.append(
+                f"    版本适用性: {vs}" + (f" ({extra})" if extra else "")
+            )
         if rec.get("precondition_hints"):
             lines.append("    利用前提: " + "；".join(rec["precondition_hints"][:4]))
         if rec.get("version_hints"):
@@ -50,6 +57,13 @@ def render_search(payload: dict[str, Any]) -> str:
         desc = rec.get("description") or ""
         if desc:
             lines.append("    描述: " + desc.replace("\n", " ")[:220])
+        lines.append("")
+    skipped = payload.get("skipped_not_affected") or []
+    if skipped:
+        lines.append("已过滤判定为不受影响的 CVE: " + ", ".join(skipped[:12]))
+        lines.append("")
+    if payload.get("error"):
+        lines.append(f"检索错误: {payload['error']}")
         lines.append("")
     lines.append("注意:")
     for d in payload.get("disclaimer") or []:

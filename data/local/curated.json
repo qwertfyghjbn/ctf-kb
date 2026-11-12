@@ -55,6 +55,15 @@
     "reviewer": "ctf-kb-mvp"
   },
   {
+    "cve_id": "CVE-2014-0160",
+    "aliases": ["Heartbleed"],
+    "affected_versions": "OpenSSL 1.0.1 before 1.0.1g",
+    "preconditions": "需要能触发 TLS heartbeat；DTLS 同样受影响。版本匹配不够，还要看是否已关闭 heartbeat / 是否已替换库。",
+    "tags": ["openssl", "memory-disclosure"],
+    "verification": "unverified",
+    "reviewer": "ctf-kb-mvp"
+  },
+  {
     "cve_id": "CVE-2022-22965",
     "aliases": ["Spring4Shell"],
     "affected_versions": "Spring MVC/WebFlux on JDK 9+",

@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT))
 
 from ctf_kb import config  # noqa: E402
 from ctf_kb.ingest import apply_curated, connect, ingest, rebuild_fts  # noqa: E402
-from ctf_kb.search import lookup_cve, search, show, stats  # noqa: E402
+from ctf_kb.search import lookup_cve, reset_range_cache, search, show, stats  # noqa: E402
 
 
 FIXTURE_CVES = [
@@ -164,6 +164,7 @@ class KbTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        reset_range_cache()
         self.conn = connect(self.db)
         ingest(self.conn, self.raw)
 
@@ -182,12 +183,51 @@ class KbTests(unittest.TestCase):
         self.assertIn("CVE-2021-42013", ids)
 
     def test_product_version_search(self) -> None:
-        payload = search(self.conn, "Apache 2.4.50")
+        payload = search(self.conn, "Apache HTTP Server 2.4.50")
         ids = [r["cve_id"] for r in payload["results"]]
         self.assertIn("CVE-2021-42013", ids)
         hit = next(r for r in payload["results"] if r["cve_id"] == "CVE-2021-42013")
-        self.assertIn("产品", hit["match_reason"] or "")
-        self.assertTrue(hit["version_hints"] or "2.4.50" in (hit["match_reason"] or ""))
+        self.assertEqual(hit.get("version_status"), "affected")
+        self.assertNotIn("CVE-2021-41773", ids)
+
+    def test_version_substring_not_prefix(self) -> None:
+        payload = search(self.conn, "Apache HTTP Server 2.4.5")
+        ids = [r["cve_id"] for r in payload["results"]]
+        self.assertNotIn("CVE-2021-42013", ids)
+        self.assertNotIn("CVE-2021-41773", ids)
+
+    def test_struts_range_without_literal_version(self) -> None:
+        payload = search(self.conn, "Apache Struts 2.5.9")
+        ids = [r["cve_id"] for r in payload["results"]]
+        self.assertIn("CVE-2017-5638", ids)
+        payload2 = search(self.conn, "Apache Struts 2.5.12")
+        ids2 = [r["cve_id"] for r in payload2["results"]]
+        self.assertNotIn("CVE-2017-5638", ids2)
+
+    def test_fts_special_chars_do_not_error(self) -> None:
+        from ctf_kb.search import _fts_query
+
+        for q in ("Apache 2.4.50", "nginx/1.18.0", "OpenSSH 8.4"):
+            expr = _fts_query(q)
+            self.assertTrue(expr, q)
+            self.conn.execute(
+                "SELECT cve_id FROM cves_fts WHERE cves_fts MATCH ? LIMIT 1", (expr,)
+            )
+        self.assertEqual(_fts_query("foo-bar"), "")
+        payload = search(self.conn, "foo-bar")
+        self.assertIsNone(payload.get("error"))
+        self.assertEqual(payload.get("count"), 0)
+
+    def test_empty_ingest_does_not_wipe(self) -> None:
+        before = self.conn.execute("SELECT COUNT(*) FROM cves").fetchone()[0]
+        self.assertGreater(before, 0)
+        empty = self.root / "empty_raw"
+        empty.mkdir()
+        (empty / "CVE_list.json").write_text("[]", encoding="utf-8")
+        stats = ingest(self.conn, empty)
+        self.assertIn("skipped", stats)
+        after = self.conn.execute("SELECT COUNT(*) FROM cves").fetchone()[0]
+        self.assertEqual(before, after)
 
     def test_vuln_type_search(self) -> None:
         by_cwe = search(self.conn, "CWE-502")

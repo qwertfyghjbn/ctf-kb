@@ -16,8 +16,8 @@ CURATED_PATH = Path(
 
 USER_AGENT = os.environ.get("CTF_KB_UA", "ctf-kb/0.1 (+local CTF knowledge base)")
 
-# 检索默认条数：避免低质量长尾污染 Agent 上下文
-DEFAULT_LIMIT = 8
+# 检索默认条数：无可靠候选时允许更少，避免低质量长尾污染 Agent 上下文
+DEFAULT_LIMIT = 5
 MAX_LIMIT = 30
 MAX_POC_LINKS = 8
 MAX_OTHER_LINKS = 6

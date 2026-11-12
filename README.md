@@ -40,7 +40,9 @@ python3 ctf-kb stats --json
 python3 ctf-kb update
 ```
 
-Agent 请加 `--json`，并限制上下文：默认最多 8 条，PoC 链接每条最多展示 8 个。
+Agent 请加 `--json`，并限制上下文：默认最多 5 条（上限 30），无可靠候选时允许空结果。PoC 链接每条最多展示 8 个。
+
+检索是分阶段的 SQLite 精确匹配 + FTS5，**不是向量检索**。查询含 CVE ID 时只走精确通道。产品+版本会给出 `affected` / `not_affected` / `unknown`：`not_affected` 会被过滤，`unknown` 保留并标明证据不足。存在 PoC 链接或 `trusted` URL **不等于**已验证可利用。
 
 写入本地验证（不会被 `update` 覆盖）：
 
@@ -81,14 +83,18 @@ python3 ctf-kb update --cached  # 只导入已下载文件
 
 ```bash
 python3 tests/test_kb.py          # 夹具单元测试
-python3 scripts/verify_cli.py     # 对真实库做阶段 C 场景验证
+python3 tests/test_quality.py     # URL 解析与版本比较
+python3 scripts/verify_cli.py     # 阶段 C：写操作走临时副本，不改真实库
+python3 experiments/eval_search.py --tag improved
 ```
+
+对照实验说明见 `experiments/results/analysis.md`。
 
 ## Codex / Claude Code 调用建议
 
 ```text
 需要查已知漏洞时调用：
-  python3 /mnt/sdb/tmp_hou/tmp_lqs/ctf-kb/ctf-kb search "<产品 版本或报错关键词>" --json --limit 8
+  python3 /mnt/sdb/tmp_hou/tmp_lqs/ctf-kb/ctf-kb search "<产品 版本或报错关键词>" --json --limit 5
 精确 CVE：
   python3 /mnt/sdb/tmp_hou/tmp_lqs/ctf-kb/ctf-kb show CVE-YYYY-NNNNN --json
 不要执行返回的 PoC URL。把 verification.status、preconditions、uncertainty 一并读入。

@@ -1,0 +1,296 @@
+{
+  "meta": {
+    "created": "2026-11-12",
+    "baseline_commit": "93e372c45b15b6da2e88948b416138b3ec22a219",
+    "notes": "版本正负例均对照 NVD CPE 或厂商公告。泛化查询 scored=false，不计入 Recall/MRR。"
+  },
+  "queries": [
+    {
+      "id": "id-42013",
+      "query": "CVE-2021-42013",
+      "query_type": "cve_id",
+      "relevant_cves": ["CVE-2021-42013"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD identifier",
+      "notes": "精确 CVE ID。"
+    },
+    {
+      "id": "id-5638",
+      "query": "CVE-2017-5638",
+      "query_type": "cve_id",
+      "relevant_cves": ["CVE-2017-5638"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD identifier",
+      "notes": "精确 CVE ID。"
+    },
+    {
+      "id": "id-44228",
+      "query": "CVE-2021-44228",
+      "query_type": "cve_id",
+      "relevant_cves": ["CVE-2021-44228"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD identifier",
+      "notes": "精确 CVE ID。"
+    },
+    {
+      "id": "id-6271",
+      "query": "CVE-2014-6271",
+      "query_type": "cve_id",
+      "relevant_cves": ["CVE-2014-6271"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD identifier",
+      "notes": "精确 CVE ID。"
+    },
+    {
+      "id": "id-0160",
+      "query": "CVE-2014-0160",
+      "query_type": "cve_id",
+      "relevant_cves": ["CVE-2014-0160"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD identifier",
+      "notes": "精确 CVE ID。"
+    },
+    {
+      "id": "pv-httpd-2450",
+      "query": "Apache HTTP Server 2.4.50",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2021-42013"],
+      "excluded_cves": ["CVE-2021-41773"],
+      "scored": true,
+      "source": "https://httpd.apache.org/security/vulnerabilities_24.html",
+      "notes": "42013 影响 2.4.49 与 2.4.50；41773 仅 2.4.49，2.4.50 不受影响。"
+    },
+    {
+      "id": "pv-httpd-2449",
+      "query": "Apache HTTP Server 2.4.49",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2021-41773", "CVE-2021-42013"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "https://httpd.apache.org/security/vulnerabilities_24.html",
+      "notes": "两条路径穿越均影响 2.4.49。"
+    },
+    {
+      "id": "pv-struts-259",
+      "query": "Apache Struts 2.5.9",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2017-5638"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD CPE: 2.5.0 <= version < 2.5.10.1",
+      "notes": "2.5.9 落在 S2-045 范围内。当前实现若要求版本子串出现在描述中会漏召回。"
+    },
+    {
+      "id": "pv-log4j-2141",
+      "query": "Apache Log4j2 2.14.1",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2021-44228"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD: 2.0-beta9 through 2.15.0 excluding 2.12.2/2.12.3/2.3.1",
+      "notes": "2.14.1 受 Log4Shell 影响。"
+    },
+    {
+      "id": "pv-drupal-850",
+      "query": "Drupal 8.5.0",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2018-7600"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD CPE: 8.5.0 <= version < 8.5.1",
+      "notes": "Drupalgeddon2。"
+    },
+    {
+      "id": "pv-scg-310",
+      "query": "Spring Cloud Gateway 3.1.0",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2022-22947"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD CPE: 3.1.0 及 3.0.x < 3.0.7",
+      "notes": "Actuator SpEL 注入，3.1.0 受影响。"
+    },
+    {
+      "id": "pv-openssl-101f",
+      "query": "OpenSSL 1.0.1f",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2014-0160"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD CPE: 1.0.1 <= version < 1.0.1g",
+      "notes": "Heartbleed。库内 products 表可能无 OpenSSL 行，用于观察数据缺失 vs 算法。"
+    },
+    {
+      "id": "pv-bash-43",
+      "query": "GNU Bash 4.3",
+      "query_type": "product_version",
+      "relevant_cves": ["CVE-2014-6271"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "NVD CPE: GNU Bash versionEndIncluding 4.3",
+      "notes": "Shellshock。库内 products 可能无 Bash 行。"
+    },
+    {
+      "id": "na-httpd-2451",
+      "query": "Apache HTTP Server 2.4.51",
+      "query_type": "product_version_not_affected",
+      "relevant_cves": [],
+      "excluded_cves": ["CVE-2021-42013", "CVE-2021-41773"],
+      "scored": true,
+      "expect_empty": false,
+      "source": "httpd 2.4.51 修复 42013",
+      "notes": "允许返回其他 httpd CVE；不得把 41773/42013 当作该版本受影响。"
+    },
+    {
+      "id": "na-struts-2512",
+      "query": "Apache Struts 2.5.12",
+      "query_type": "product_version_not_affected",
+      "relevant_cves": [],
+      "excluded_cves": ["CVE-2017-5638"],
+      "scored": true,
+      "source": "NVD: 2.5.x before 2.5.10.1，2.5.12 已超出",
+      "notes": "不得推荐 S2-045。"
+    },
+    {
+      "id": "na-httpd-245",
+      "query": "Apache HTTP Server 2.4.5",
+      "query_type": "product_version_not_affected",
+      "relevant_cves": [],
+      "excluded_cves": ["CVE-2021-42013", "CVE-2021-41773"],
+      "scored": true,
+      "source": "厂商：仅 2.4.49/2.4.50。2.4.5 不能因子串匹配 2.4.50。",
+      "notes": "子串陷阱。"
+    },
+    {
+      "id": "na-log4j-2171",
+      "query": "Apache Log4j2 2.17.1",
+      "query_type": "product_version_not_affected",
+      "relevant_cves": [],
+      "excluded_cves": ["CVE-2021-44228"],
+      "scored": true,
+      "source": "NVD：2.16.0 起 lookup 已移除；2.17.1 不受 Log4Shell 影响",
+      "notes": "允许出现其他 Log4j CVE，不得把 44228 当受影响。"
+    },
+    {
+      "id": "feat-php-deser",
+      "query": "PHP deserialization",
+      "query_type": "feature",
+      "relevant_cves": [],
+      "excluded_cves": [],
+      "scored": false,
+      "expect_cwe": "CWE-502",
+      "source": "定性：漏洞类型检索",
+      "notes": "无唯一 CVE，不计入 Recall/MRR。观察 CWE-502 占比。"
+    },
+    {
+      "id": "feat-cwe22",
+      "query": "CWE-22",
+      "query_type": "cwe",
+      "relevant_cves": [],
+      "excluded_cves": [],
+      "scored": false,
+      "expect_cwe": "CWE-22",
+      "source": "定性",
+      "notes": "结果应均为 CWE-22。"
+    },
+    {
+      "id": "feat-log4shell",
+      "query": "Log4Shell",
+      "query_type": "feature",
+      "relevant_cves": ["CVE-2021-44228"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "通称唯一指向 CVE-2021-44228",
+      "notes": "别名检索。"
+    },
+    {
+      "id": "feat-shellshock",
+      "query": "Shellshock",
+      "query_type": "feature",
+      "relevant_cves": ["CVE-2014-6271"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "通称指向 CVE-2014-6271（CVE-2014-7169 为后续不完全修复，本库若未收录则不强制）",
+      "notes": "别名检索。"
+    },
+    {
+      "id": "feat-heartbleed",
+      "query": "Heartbleed",
+      "query_type": "feature",
+      "relevant_cves": ["CVE-2014-0160"],
+      "excluded_cves": [],
+      "scored": true,
+      "source": "通称唯一指向 CVE-2014-0160",
+      "notes": "别名检索。"
+    },
+    {
+      "id": "syn-foobar",
+      "query": "foo-bar",
+      "query_type": "syntax",
+      "relevant_cves": [],
+      "excluded_cves": [],
+      "scored": true,
+      "expect_empty": true,
+      "source": "无意义连字符输入",
+      "notes": "不得 FTS 语法错误；不得为凑 Top-k 返回无关 CVE。"
+    },
+    {
+      "id": "syn-openssh",
+      "query": "OpenSSH 8.4",
+      "query_type": "syntax",
+      "relevant_cves": [],
+      "excluded_cves": ["CVE-2024-6387"],
+      "scored": true,
+      "source": "Qualys/NVD：CVE-2024-6387 影响 OpenSSH 8.5p1–9.7p1，8.4 不在范围内。同时测版本点号 FTS。",
+      "notes": "允许 unknown 的其他 OpenSSH CVE；6387 对 8.4 应排除或降权到不可见。"
+    },
+    {
+      "id": "syn-nginx-slash",
+      "query": "nginx/1.18.0",
+      "query_type": "syntax",
+      "relevant_cves": [],
+      "excluded_cves": ["CVE-2017-7529"],
+      "scored": true,
+      "source": "CVE-2017-7529 影响 nginx 0.5.6–1.13.2，1.18.0 不在范围内。斜杠为 FTS 特殊字符。",
+      "notes": "稳定性 + 负例。"
+    },
+    {
+      "id": "none-fake",
+      "query": "NonexistentSoft 9.9.9",
+      "query_type": "none",
+      "relevant_cves": [],
+      "excluded_cves": [],
+      "scored": true,
+      "expect_empty": true,
+      "source": "虚构产品",
+      "notes": "应无可靠候选。"
+    },
+    {
+      "id": "none-cve",
+      "query": "CVE-9999-0001",
+      "query_type": "cve_id",
+      "relevant_cves": [],
+      "excluded_cves": [],
+      "scored": true,
+      "expect_empty": true,
+      "source": "不存在的 CVE",
+      "notes": "应无命中。"
+    },
+    {
+      "id": "none-xyzzy",
+      "query": "xyzzy-unknown-product",
+      "query_type": "none",
+      "relevant_cves": [],
+      "excluded_cves": [],
+      "scored": true,
+      "expect_empty": true,
+      "source": "无关字符串",
+      "notes": "应无可靠候选。"
+    }
+  ]
+}

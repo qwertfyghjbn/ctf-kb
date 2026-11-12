@@ -46,7 +46,8 @@ python3 ctf-kb note CVE-xxxx --status verified_ok \
 
 ## 4. 混合检索 / Reranker
 
-当前 FTS5 + 产品 LIKE + CWE 精确匹配，对 CVE ID / 产品名 / 常见漏洞类型足够。
+当前为分阶段检索：CVE ID 精确 → CWE 精确 → 产品字段 + 结构化版本范围 → FTS5。
+产品+版本无可靠候选时允许空结果，不再 LIKE 回退。版本状态只允许 affected / not_affected / unknown。
 
 **只有**在实际 CTF 日志里出现大量“关键词对不上（例如指纹是 Banner 变体、中文报错）”时，再考虑：
 

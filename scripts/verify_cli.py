@@ -10,18 +10,25 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BIN = [sys.executable, str(ROOT / "ctf-kb")]
+# 真实库只读；会写库的步骤改走临时副本，避免污染 data/ctf-kb.sqlite
+REAL_DB = ROOT / "data" / "ctf-kb.sqlite"
+COPY_DB: Path | None = None
 
 
-def run(*args: str) -> tuple[int, str]:
-    p = subprocess.run(BIN + list(args), cwd=ROOT, capture_output=True, text=True)
+def run(*args: str, db: Path | None = None) -> tuple[int, str]:
+    extra: list[str] = []
+    if db is not None:
+        extra = ["--db", str(db)]
+    # --db 放在子命令后，避免被 argparse parents 冲掉
+    p = subprocess.run(BIN + list(args) + extra, cwd=ROOT, capture_output=True, text=True)
     out = p.stdout
     if p.returncode != 0 and not out:
         out = p.stderr
     return p.returncode, out
 
 
-def jrun(*args: str) -> dict:
-    code, out = run(*args, "--json")
+def jrun(*args: str, db: Path | None = None) -> dict:
+    code, out = run(*args, "--json", db=db)
     try:
         data = json.loads(out)
     except json.JSONDecodeError:
@@ -31,7 +38,15 @@ def jrun(*args: str) -> dict:
 
 
 def main() -> int:
+    import shutil
+    import tempfile
+
     results = []
+    tmp = tempfile.TemporaryDirectory(prefix="ctf-kb-verify-")
+    copy_db = Path(tmp.name) / "ctf-kb.copy.sqlite"
+    shutil.copy2(REAL_DB, copy_db)
+    global COPY_DB
+    COPY_DB = copy_db
 
     def ok(name, cond, detail=""):
         results.append((name, bool(cond), detail))
@@ -81,7 +96,7 @@ def main() -> int:
     v44228 = (rec2.get("verification") or {}).get("status")
     ok("5. 区分验证状态", v42013 == "static_review" and v44228 == "unverified", f"42013={v42013} 44228={v44228}")
 
-    # 6. 本地记录不被 update --cached 覆盖：先 note，再 update --cached
+    # 6. 本地记录不被 update --cached 覆盖。写操作只打副本库。
     code, _ = run(
         "note",
         "CVE-2017-5638",
@@ -91,11 +106,12 @@ def main() -> int:
         "verification-script-marker",
         "--preconditions",
         "verification-script-precondition",
+        db=copy_db,
     )
     ok("6a. note 写入", code == 0)
-    code, _ = run("update", "--cached")
+    code, _ = run("update", "--cached", db=copy_db)
     ok("6b. update --cached", code == 0)
-    rec3 = jrun("show", "CVE-2017-5638")
+    rec3 = jrun("show", "CVE-2017-5638", db=copy_db)
     ver = rec3.get("verification") or {}
     note = rec3.get("local_note") or {}
     ok(
@@ -103,8 +119,15 @@ def main() -> int:
         ver.get("status") == "verified_fail" and "verification-script-precondition" in (note.get("preconditions") or ""),
         f"status={ver.get('status')} pre={note.get('preconditions')}",
     )
-    rec4 = jrun("show", "CVE-2021-42013")
+    rec4 = jrun("show", "CVE-2021-42013", db=copy_db)
     ok("6c. curated 仍在", (rec4.get("verification") or {}).get("status") == "static_review")
+    # 确认真实库未被脚本改写
+    real = jrun("show", "CVE-2017-5638")
+    ok(
+        "6d. 真实库未被脚本污染",
+        "verification-script-marker" not in str((real.get("verification") or {}).get("evidence") or ""),
+        str((real.get("verification") or {}).get("status")),
+    )
 
     s = jrun("search", "PHP deserialization", "--limit", "8")
     ids = [r["cve_id"] for r in s.get("results") or []]
@@ -120,6 +143,7 @@ def main() -> int:
     failed = [n for n, c, _ in results if not c]
     print("\n==== 汇总 ====")
     print(f"通过 {sum(1 for _,c,_ in results if c)} / {len(results)}")
+    tmp.cleanup()
     if failed:
         print("失败:", failed)
         return 1

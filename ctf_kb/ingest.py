@@ -130,13 +130,10 @@ def connect(db_path: Path | None = None) -> sqlite3.Connection:
 
 
 def _replace_upstream_tables(conn: sqlite3.Connection) -> None:
-    conn.executescript(
-        """
-        DELETE FROM artifacts;
-        DELETE FROM products;
-        DELETE FROM cves;
-        """
-    )
+    # 不用 executescript：它会先 COMMIT，破坏外层事务。
+    conn.execute("DELETE FROM artifacts")
+    conn.execute("DELETE FROM products")
+    conn.execute("DELETE FROM cves")
 
 
 def ingest(conn: sqlite3.Connection, raw_dir: Path | None = None) -> dict[str, Any]:
@@ -163,9 +160,17 @@ def ingest(conn: sqlite3.Connection, raw_dir: Path | None = None) -> dict[str, A
         if cid:
             nuclei_by_cve[cid] = row
 
-    now = utc_now()
-    _replace_upstream_tables(conn)
+    if not isinstance(cve_list, list) or not cve_list:
+        return {
+            "cves": 0,
+            "artifacts": 0,
+            "products": 0,
+            "curated": 0,
+            "skipped": "empty or missing CVE_list, database unchanged",
+            "ingested_at": utc_now(),
+        }
 
+    now = utc_now()
     artifact_rows: list[tuple] = []
     product_rows: list[tuple] = []
     cve_rows: list[tuple] = []
@@ -318,56 +323,75 @@ def ingest(conn: sqlite3.Connection, raw_dir: Path | None = None) -> dict[str, A
             )
         )
 
-    conn.executemany(
-        """
-        INSERT INTO cves (
-            cve_id, title, description, vendor, products, cwe,
-            cvss_score, cvss_severity, cvss_vector, published, modified,
-            kev, kev_date, epss, epss_percentile,
-            poc_count, nuclei_count, msf_count, edb_count, vulhub_count,
-            has_official_nuclei, sources, updated_at
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        """,
-        cve_rows,
-    )
-    conn.executemany(
-        """
-        INSERT OR IGNORE INTO artifacts (cve_id, kind, url, title, extra, source, trusted)
-        VALUES (?,?,?,?,?,?,?)
-        """,
-        artifact_rows,
-    )
-    conn.executemany(
-        """
-        INSERT OR IGNORE INTO products (cve_id, vendor, product, version_hint)
-        VALUES (?,?,?,?)
-        """,
-        product_rows,
-    )
+    if not cve_rows:
+        return {
+            "cves": 0,
+            "artifacts": 0,
+            "products": 0,
+            "curated": 0,
+            "skipped": "no valid CVE records, database unchanged",
+            "ingested_at": now,
+        }
 
-    conn.execute(
-        "INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)",
-        ("upstream_ingested_at", now),
-    )
-    conn.execute(
-        "INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)",
-        ("upstream_cve_count", str(len(cve_rows))),
-    )
-    conn.commit()
+    try:
+        _replace_upstream_tables(conn)
+        conn.executemany(
+            """
+            INSERT INTO cves (
+                cve_id, title, description, vendor, products, cwe,
+                cvss_score, cvss_severity, cvss_vector, published, modified,
+                kev, kev_date, epss, epss_percentile,
+                poc_count, nuclei_count, msf_count, edb_count, vulhub_count,
+                has_official_nuclei, sources, updated_at
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """,
+            cve_rows,
+        )
+        conn.executemany(
+            """
+            INSERT OR IGNORE INTO artifacts (cve_id, kind, url, title, extra, source, trusted)
+            VALUES (?,?,?,?,?,?,?)
+            """,
+            artifact_rows,
+        )
+        conn.executemany(
+            """
+            INSERT OR IGNORE INTO products (cve_id, vendor, product, version_hint)
+            VALUES (?,?,?,?)
+            """,
+            product_rows,
+        )
 
-    apply_curated(conn)
+        conn.execute(
+            "INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)",
+            ("upstream_ingested_at", now),
+        )
+        conn.execute(
+            "INSERT OR REPLACE INTO meta(key, value) VALUES (?, ?)",
+            ("upstream_cve_count", str(len(cve_rows))),
+        )
+        curated_n = apply_curated(conn, commit=False)
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+
+    # FTS 含 DROP/CREATE，SQLite DDL 会隐式提交；放在上游数据提交之后。
     rebuild_fts(conn)
 
     stats = {
         "cves": len(cve_rows),
         "artifacts": len(artifact_rows),
         "products": len(product_rows),
+        "curated": curated_n,
         "ingested_at": now,
     }
     return stats
 
 
-def apply_curated(conn: sqlite3.Connection, path: Path | None = None) -> int:
+def apply_curated(
+    conn: sqlite3.Connection, path: Path | None = None, commit: bool = True
+) -> int:
     """导入本地精选记录。不删除已有人工记录，按 cve_id upsert。"""
     path = path or config.CURATED_PATH
     if not path.exists():
@@ -420,11 +444,12 @@ def apply_curated(conn: sqlite3.Connection, path: Path | None = None) -> int:
                 ),
             )
         n += 1
-    conn.commit()
+    if commit:
+        conn.commit()
     return n
 
 
-def rebuild_fts(conn: sqlite3.Connection) -> None:
+def rebuild_fts(conn: sqlite3.Connection, commit: bool = True) -> None:
     conn.execute("DROP TABLE IF EXISTS cves_fts")
     conn.execute(
         """
@@ -460,6 +485,35 @@ def rebuild_fts(conn: sqlite3.Connection) -> None:
         FROM cves c
         LEFT JOIN local_notes n ON n.cve_id = c.cve_id
         """
+    )
+    if commit:
+        conn.commit()
+
+
+def upsert_fts(conn: sqlite3.Connection, cve_id: str) -> None:
+    """单条 note 变更后增量更新 FTS，避免全表重建。"""
+    cve_id = cve_id.upper().strip()
+    conn.execute("DELETE FROM cves_fts WHERE cve_id = ?", (cve_id,))
+    conn.execute(
+        """
+        INSERT INTO cves_fts (
+            cve_id, title, description, vendor, products, cwe, preconditions, tags, aliases
+        )
+        SELECT
+            c.cve_id,
+            COALESCE(c.title, ''),
+            COALESCE(c.description, ''),
+            COALESCE(c.vendor, ''),
+            COALESCE(c.products, ''),
+            COALESCE(c.cwe, ''),
+            COALESCE(n.preconditions, ''),
+            COALESCE(n.tags, ''),
+            COALESCE(n.aliases, '')
+        FROM cves c
+        LEFT JOIN local_notes n ON n.cve_id = c.cve_id
+        WHERE c.cve_id = ?
+        """,
+        (cve_id,),
     )
     conn.commit()
 

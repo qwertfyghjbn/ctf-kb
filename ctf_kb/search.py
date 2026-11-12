@@ -1,4 +1,7 @@
-"""本地检索。优先精确匹配，其次产品/CWE，再次 FTS5 关键词。"""
+"""本地检索。分阶段：精确 CVE → CWE → 产品/版本 → FTS5。
+
+不把版本子串当成受影响证据；无可靠候选时允许空结果。
+"""
 
 from __future__ import annotations
 
@@ -10,10 +13,21 @@ from typing import Any
 from ctf_kb import config
 from ctf_kb.extract import extract_preconditions, extract_version_hints
 from ctf_kb.quality import KIND_LABELS, STATUS_LABELS, UNCERTAINTY_BASE
+from ctf_kb.versioning import (
+    VersionRange,
+    evaluate_version,
+    load_range_file,
+    parse_affected_text,
+)
 
 CVE_RE = re.compile(r"\bCVE-\d{4}-\d{4,}\b", re.I)
 CWE_RE = re.compile(r"\bCWE-\d+\b", re.I)
-VERSION_RE = re.compile(r"\b\d+(?:\.\d+){1,4}\b")
+# 允许 1.0.1f / 8.5p1；禁止把 2.4.5 当成 2.4.50 的前缀
+VERSION_RE = re.compile(r"\b\d+(?:\.\d+){1,4}(?:[A-Za-z]+\d*)?\b")
+_FTS_RESERVED = {"AND", "OR", "NOT", "NEAR"}
+
+_RANGES_BY_CVE: dict[str, list[VersionRange]] | None = None
+_ALL_RANGES: list[VersionRange] | None = None
 
 
 def connect(db_path=None) -> sqlite3.Connection:
@@ -26,35 +40,59 @@ def _row_to_dict(row: sqlite3.Row) -> dict[str, Any]:
     return {k: row[k] for k in row.keys()}
 
 
+def _quote_fts_token(tok: str) -> str:
+    return '"' + tok.replace('"', '""') + '"'
+
+
 def _fts_query(text: str) -> str:
-    """把用户输入转成相对安全的 FTS5 MATCH 表达式。"""
-    text = text.strip()
+    """把用户输入转成安全的 FTS5 MATCH 表达式。
+
+    每个 token 都加双引号，避免 '.' '-' '/' 被当成列过滤器或语法。
+    失败时返回空串，由调用方决定是否报错。
+    """
+    text = (text or "").strip()
     if not text:
         return ""
-    # 已是 CVE / CWE 时交给精确通道
-    tokens = re.findall(r"[A-Za-z0-9_./+-]+", text)
     cleaned: list[str] = []
-    for tok in tokens:
-        tok = tok.replace('"', "")
-        if not tok or tok in {"AND", "OR", "NOT", "NEAR"}:
+    for raw in re.split(r"\s+", text):
+        raw = raw.replace('"', "").strip()
+        if not raw or raw.upper() in _FTS_RESERVED:
             continue
-        if any(ch in tok for ch in "*\"^"):
+        # nginx/1.18.0 → nginx + 1.18.0
+        if "/" in raw:
+            for part in raw.split("/"):
+                part = part.strip()
+                if not part or part.upper() in _FTS_RESERVED:
+                    continue
+                cleaned.append(_quote_fts_token(part))
             continue
-        cleaned.append(tok)
+        # foo-bar 整词丢弃，避免拆成 foo AND bar 误命中
+        if "-" in raw and not re.match(r"^\d", raw):
+            continue
+        cleaned.append(_quote_fts_token(raw))
     if not cleaned:
         return ""
-    # 短语优先：多词用 AND，保留原始短语
     if len(cleaned) == 1:
         return cleaned[0]
-    quoted = " ".join(cleaned)
-    and_expr = " AND ".join(cleaned)
-    return f'("{quoted}") OR ({and_expr})'
+    return " AND ".join(cleaned)
 
 
 def _limit(n: int | None) -> int:
     if n is None:
         return config.DEFAULT_LIMIT
     return max(1, min(int(n), config.MAX_LIMIT))
+
+
+def _cached_ranges() -> tuple[dict[str, list[VersionRange]], list[VersionRange]]:
+    global _RANGES_BY_CVE, _ALL_RANGES
+    if _ALL_RANGES is None:
+        rows = load_range_file()
+        by: dict[str, list[VersionRange]] = {}
+        for rng in rows:
+            by.setdefault(rng.cve_id, []).append(rng)
+        _ALL_RANGES = rows
+        _RANGES_BY_CVE = by
+    return _RANGES_BY_CVE or {}, _ALL_RANGES or []
 
 
 def lookup_cve(conn: sqlite3.Connection, cve_id: str) -> dict[str, Any] | None:
@@ -210,6 +248,88 @@ def _uncertainty(rec: dict[str, Any]) -> list[str]:
     return items
 
 
+_VENDOR_TOKENS = {
+    "apache",
+    "gnu",
+    "software",
+    "foundation",
+    "project",
+    "inc",
+    "the",
+    "open",
+    "source",
+}
+
+
+def reset_range_cache() -> None:
+    """测试或更换 LOCAL_DIR 后清空范围缓存。"""
+    global _RANGES_BY_CVE, _ALL_RANGES
+    _RANGES_BY_CVE = None
+    _ALL_RANGES = None
+
+
+def _specific_product_tokens(name: str | None) -> set[str]:
+    toks = re.findall(r"[a-z0-9]+", (name or "").lower())
+    out: set[str] = set()
+    for t in toks:
+        if t in _VENDOR_TOKENS or len(t) <= 1:
+            continue
+        out.add(t)
+        # log4j2 / struts2 与 log4j / struts 视为同一产品族
+        stemmed = t.rstrip("0123456789")
+        if stemmed and stemmed != t and len(stemmed) >= 4:
+            out.add(stemmed)
+    return out
+
+
+def _ranges_for_record(rec: dict[str, Any]) -> list[VersionRange]:
+    by_cve, _ = _cached_ranges()
+    ranges = list(by_cve.get(rec["cve_id"], []))
+    note = (rec.get("local") or {}).get("note") or {}
+    av = note.get("affected_versions")
+    if av:
+        parsed = parse_affected_text(rec["cve_id"], av, "local_notes.affected_versions")
+        if parsed:
+            ranges.append(parsed)
+    return ranges
+
+
+def _version_belongs_to_query_product(
+    product_q: str | None, rec: dict[str, Any], ranges: list[VersionRange]
+) -> bool:
+    """查询带具体产品名时，只对该产品相关的 CVE 使用版本范围。"""
+    if not product_q:
+        return True
+    q_toks = _specific_product_tokens(product_q)
+    if not q_toks:
+        # 仅厂商名（如 Apache）不能套用 Log4j/Struts 等具体产品的版本范围
+        return False
+    p_toks = _specific_product_tokens(rec.get("products"))
+    for rng in ranges:
+        p_toks |= _specific_product_tokens(rng.product)
+    if not p_toks:
+        return True
+    return bool(q_toks & p_toks)
+
+
+def _apply_version(
+    rec: dict[str, Any], version_q: str | None, product_q: str | None = None
+) -> str:
+    if not version_q:
+        rec["version_status"] = "unknown"
+        rec["version_evidence"] = None
+        return "unknown"
+    ranges = _ranges_for_record(rec)
+    if not _version_belongs_to_query_product(product_q, rec, ranges):
+        rec["version_status"] = "unknown"
+        rec["version_evidence"] = None
+        return "unknown"
+    status, evidence = evaluate_version(version_q, ranges)
+    rec["version_status"] = status
+    rec["version_evidence"] = evidence
+    return status
+
+
 def _summary(rec: dict[str, Any], match_reason: str | None = None) -> dict[str, Any]:
     arts = rec.get("artifacts") or {}
     totals = arts.get("_totals") or {}
@@ -232,6 +352,8 @@ def _summary(rec: dict[str, Any], match_reason: str | None = None) -> dict[str, 
         "vulhub_count": rec.get("vulhub_count") or 0,
         "verification": _verification_view(rec),
         "match_reason": match_reason or rec.get("match_reason"),
+        "version_status": rec.get("version_status") or "unknown",
+        "version_evidence": rec.get("version_evidence"),
         "precondition_hints": rec.get("precondition_hints")
         or extract_preconditions(
             " ".join(x for x in [rec.get("title"), rec.get("description")] if x)
@@ -261,6 +383,14 @@ def search(
     query = (query or "").strip()
     hits: list[dict[str, Any]] = []
     seen: set[str] = set()
+    skipped_not_affected: list[str] = []
+    fts_error: str | None = None
+
+    cve_ids = [m.upper() for m in CVE_RE.findall(query)]
+    product_q = product
+    if not product_q and not cve_ids:
+        product_q = _guess_product_query(query)
+    version_q = version or (_guess_version(query) if not cve_ids else None)
 
     def add(cve_id: str, reason: str, rank: float) -> None:
         if cve_id in seen:
@@ -268,14 +398,28 @@ def search(
         rec = lookup_cve(conn, cve_id)
         if not rec:
             return
+        st = _apply_version(rec, version_q, product_q)
         seen.add(cve_id)
+        if version_q and st == "not_affected":
+            skipped_not_affected.append(cve_id)
+            return
         rec["match_reason"] = reason
+        if version_q:
+            rec["match_reason"] = f"{reason}；版本适用性={st}"
         rec["rank"] = rank
+        if st == "affected":
+            rec["rank"] = rank + 12.0
         hits.append(rec)
 
-    # 1) 精确 CVE
-    for m in CVE_RE.findall(query):
-        add(m.upper(), f"查询包含 CVE ID {m.upper()}", 100)
+    # 1) 精确 CVE：不再走全文 / 产品 / LIKE
+    if cve_ids:
+        for cid in cve_ids:
+            add(cid, f"查询包含 CVE ID {cid}", 100)
+        hits.sort(key=lambda r: r.get("rank", 0), reverse=True)
+        hits = hits[:limit_n]
+        return _pack(
+            query, product_q, cwe, version_q, hits, skipped_not_affected, fts_error
+        )
 
     # 2) 显式 CWE
     cwe_q = cwe or None
@@ -295,17 +439,18 @@ def search(
         ).fetchall()
         for i, row in enumerate(rows):
             add(row["cve_id"], f"CWE 精确匹配 {cwe_q.upper()}", 90 - i * 0.1)
+        if CWE_RE.fullmatch(query.strip()):
+            hits.sort(key=lambda r: r.get("rank", 0), reverse=True)
+            hits = hits[:limit_n]
+            return _pack(
+                query, product_q, cwe_q, version_q, hits, skipped_not_affected, fts_error
+            )
 
-    # 3) 产品名
-    product_q = product
-    if not product_q:
-        # 用户可能输入 "Apache 2.4.50" / "PHP deserialization"
-        product_q = _guess_product_query(query)
-    version_q = version or _guess_version(query)
-
-    if product_q:
+    # 3) 产品名 + 结构化版本（unknown 保留，not_affected 过滤）
+    # 仅厂商名（如单独的 Apache）走 FTS，避免 Log4j/Struts 抢位
+    product_specific = bool(product_q and _specific_product_tokens(product_q))
+    if product_q and product_specific:
         like = f"%{product_q}%"
-        # 宽召回后再按“产品名贴合度 + 版本提示”重排，避免 vendor=Apache 把 Log4j 排到 httpd 前面
         rows = conn.execute(
             """
             SELECT p.cve_id, p.product, p.vendor, p.version_hint,
@@ -317,40 +462,43 @@ def search(
             (like, like),
         ).fetchall()
         scored: list[tuple[float, str, str]] = []
+        q = product_q.lower()
         for row in rows:
             prod = (row["product"] or "").lower()
             vend = (row["vendor"] or "").lower()
-            hint = row["version_hint"] or ""
-            blob = " ".join(
-                x or "" for x in (row["title"], row["description"], hint, row["product"])
-            )
-            q = product_q.lower()
             rank = 55.0
             reason = f"产品字段匹配 {row['product']}"
             if q in prod:
                 rank = 82.0
             elif q in vend:
                 rank = 62.0
-            if version_q and version_q in hint:
-                rank += 18.0
-                reason += f"；描述中出现版本提示 {version_q}（非精确判定）"
-            elif version_q and version_q in blob:
-                rank += 10.0
-                reason += f"；文本中出现 {version_q}，需人工核对是否落在受影响范围"
-            elif version_q:
-                # 查询带版本但该 CVE 文本完全未提及，不当作产品命中
-                # （仍可能被 FTS 捞到，避免 Apache 厂商下的 Log4j/Struts 挤掉 httpd）
+            else:
                 continue
             if row["kev"]:
                 rank += 1.5
             rank += min(float(row["epss"] or 0), 1.0)
             scored.append((rank, row["cve_id"], reason))
         scored.sort(key=lambda x: x[0], reverse=True)
-        for rank, cve_id, reason in scored[: limit_n * 3]:
+        for rank, cve_id, reason in scored[: limit_n * 4]:
             add(cve_id, reason, rank)
 
-    # 4) FTS 关键词
-    if query and not CVE_RE.fullmatch(query.strip()):
+        # 精选范围里的产品名，补 products 表缺失的条目（如部分 OpenSSL/Bash）
+        _, all_ranges = _cached_ranges()
+        for rng in all_ranges:
+            if not rng.product:
+                continue
+            if q in rng.product.lower() or rng.product.lower() in q:
+                add(
+                    rng.cve_id,
+                    f"精选版本范围匹配产品 {rng.product}",
+                    80.0,
+                )
+
+    # 4) FTS：仅在精确通道不够时；语法错误不得伪装成 0 命中。
+    # 已经按产品+版本查过且无候选时，不再全文凑 Top-k。
+    pure_cwe = bool(cwe_q and CWE_RE.fullmatch(query.strip()))
+    skip_fts = bool(product_specific and version_q and not hits)
+    if query and not pure_cwe and not skip_fts and len(hits) < limit_n:
         fts = _fts_query(query)
         if fts:
             try:
@@ -365,29 +513,40 @@ def search(
                     """,
                     (fts, limit_n * 2),
                 ).fetchall()
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as exc:
+                fts_error = str(exc)
                 rows = []
             for i, row in enumerate(rows):
-                add(row["cve_id"], f"全文检索匹配 {query!r}", 50 - float(row["score"] or 0) - i * 0.01)
+                add(
+                    row["cve_id"],
+                    f"全文检索匹配 {query!r}",
+                    50 - float(row["score"] or 0) - i * 0.01,
+                )
 
-    # 若仍为空，退回 LIKE
-    if not hits and query:
-        like = f"%{query}%"
-        rows = conn.execute(
-            """
-            SELECT cve_id FROM cves
-            WHERE cve_id LIKE ? OR IFNULL(title,'') LIKE ?
-               OR IFNULL(description,'') LIKE ? OR IFNULL(products,'') LIKE ?
-            ORDER BY kev DESC, epss DESC, poc_count DESC
-            LIMIT ?
-            """,
-            (like, like, like, like, limit_n),
-        ).fetchall()
-        for row in rows:
-            add(row["cve_id"], f"LIKE 回退匹配 {query!r}", 10)
-
+    # 不再做 LIKE 回退：无可靠候选就空结果，避免凑 Top-k
     hits.sort(key=lambda r: r.get("rank", 0), reverse=True)
     hits = hits[:limit_n]
+    return _pack(
+        query, product_q, cwe_q, version_q, hits, skipped_not_affected, fts_error
+    )
+
+
+def _pack(
+    query: str,
+    product_q: str | None,
+    cwe_q: str | None,
+    version_q: str | None,
+    hits: list[dict[str, Any]],
+    skipped_not_affected: list[str],
+    fts_error: str | None,
+) -> dict[str, Any]:
+    status = "ok"
+    error = None
+    if fts_error:
+        status = "fts_error"
+        error = fts_error
+    elif not hits:
+        status = "empty"
     return {
         "query": query,
         "product": product_q,
@@ -395,6 +554,9 @@ def search(
         "version": version_q,
         "count": len(hits),
         "results": [_summary(h) for h in hits],
+        "skipped_not_affected": skipped_not_affected[:20],
+        "status": status,
+        "error": error,
         "disclaimer": UNCERTAINTY_BASE,
     }
 
@@ -426,14 +588,13 @@ def show(conn: sqlite3.Connection, cve_id: str) -> dict[str, Any]:
         "updated_at": rec.get("updated_at"),
         "verification": rec["verification"],
         "local_note": (rec.get("local") or {}).get("note"),
-        "affected_versions": ((rec.get("local") or {}).get("note") or {}).get("affected_versions"),
+        "affected_versions": ((rec.get("local") or {}).get("note") or {}).get(
+            "affected_versions"
+        ),
         "preconditions": rec["precondition_hints"],
         "version_hints_from_description": rec["version_hints"],
         "exploitability": rec["exploitability"],
-        "artifacts": {
-            k: arts.get(k) or []
-            for k in KIND_LABELS
-        },
+        "artifacts": {k: arts.get(k) or [] for k in KIND_LABELS},
         "artifact_totals": arts.get("_totals") or {},
         "artifact_truncated": arts.get("_truncated") or {},
         "uncertainty": rec["uncertainty"],
@@ -473,14 +634,13 @@ def stats(conn: sqlite3.Connection) -> dict[str, Any]:
 
 
 def _guess_product_query(query: str) -> str | None:
-    # 去掉版本号后再看是否像产品名
     stripped = VERSION_RE.sub(" ", query)
     stripped = CWE_RE.sub(" ", stripped)
     stripped = CVE_RE.sub(" ", stripped)
+    stripped = re.sub(r"[/]+", " ", stripped)
     stripped = re.sub(r"\s+", " ", stripped).strip()
     if not stripped:
         return None
-    # 太像漏洞类型描述则不当产品
     type_words = (
         "deserialization",
         "injection",
@@ -496,7 +656,6 @@ def _guess_product_query(query: str) -> str | None:
     low = stripped.lower()
     if any(w in low for w in type_words) and len(stripped.split()) <= 4:
         return None
-    # 单字母无意义
     if len(stripped) < 3:
         return None
     return stripped

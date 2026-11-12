@@ -8,7 +8,7 @@ import sys
 from typing import Any
 
 from ctf_kb import config
-from ctf_kb.ingest import apply_curated, connect, fetch_raw, ingest, rebuild_fts
+from ctf_kb.ingest import connect, fetch_raw, ingest, upsert_fts
 from ctf_kb.render import render_search, render_show, render_stats
 from ctf_kb.search import lookup_cve, search, show, stats
 
@@ -21,12 +21,10 @@ def cmd_update(args: argparse.Namespace) -> int:
     status = fetch_raw(force=not args.cached)
     conn = connect()
     result = ingest(conn)
-    curated_n = apply_curated(conn)
-    rebuild_fts(conn)
     payload = {
         "fetch": status,
         "ingest": result,
-        "curated_upserted": curated_n,
+        "curated_upserted": result.get("curated", 0),
         "db": str(config.DB_PATH),
     }
     if args.json:
@@ -39,7 +37,7 @@ def cmd_update(args: argparse.Namespace) -> int:
             f"导入 CVE={result.get('cves')} artifacts={result.get('artifacts')} "
             f"products={result.get('products')}"
         )
-        print(f"本地精选 upsert: {curated_n}")
+        print(f"本地精选 upsert: {result.get('curated', 0)}")
         print(f"数据库: {config.DB_PATH}")
     conn.close()
     return 0
@@ -145,7 +143,7 @@ def cmd_note(args: argparse.Namespace) -> int:
             (cve_id, args.aliases, args.versions, args.preconditions, args.notes, args.tags),
         )
     conn.commit()
-    rebuild_fts(conn)
+    upsert_fts(conn, cve_id)
     payload = show(conn, cve_id)
     if args.json:
         print(_dumps({"ok": True, "cve_id": cve_id, "local_note": payload.get("local_note"), "verification": payload.get("verification")}))
@@ -173,7 +171,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("search", parents=[common], help="关键词 / 产品 / 漏洞类型检索")
     sp.add_argument("query", help="如 'Apache 2.4.50' 或 'PHP deserialization'")
-    sp.add_argument("--limit", type=int, default=config.DEFAULT_LIMIT)
+    sp.add_argument(
+        "--limit",
+        type=int,
+        default=config.DEFAULT_LIMIT,
+        help="默认 5，上限 30；无可靠候选时允许空结果",
+    )
     sp.add_argument("--product", help="按产品名过滤")
     sp.add_argument("--cwe", help="按 CWE 过滤，如 CWE-502")
     sp.add_argument("--version", help="版本提示，仅作匹配依据而非判定")
@@ -209,13 +212,26 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _flag_value(raw: list[str], flag: str) -> str | None:
+    """子命令前后都能取到 --db 这类选项。argparse parents 会把前置选项冲掉。"""
+    if flag not in raw:
+        return None
+    i = raw.index(flag)
+    if i + 1 < len(raw) and not raw[i + 1].startswith("-"):
+        return raw[i + 1]
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:
     raw = list(argv) if argv is not None else sys.argv[1:]
     json_anywhere = "--json" in raw
+    db_anywhere = _flag_value(raw, "--db")
     parser = build_parser()
     args = parser.parse_args(argv)
     if json_anywhere:
         args.json = True
+    if db_anywhere:
+        args.db = db_anywhere
     if args.db:
         config.DB_PATH = __import__("pathlib").Path(args.db).expanduser().resolve()
     try:
