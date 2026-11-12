@@ -1,0 +1,2 @@
+# MVP 仅使用 Python 标准库（sqlite3 / json / urllib / argparse / unittest）
+# 无第三方依赖。Python >= 3.9，需要 SQLite FTS5（官方发行版均包含）。

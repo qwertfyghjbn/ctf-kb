@@ -1,0 +1,66 @@
+[
+  {
+    "cve_id": "CVE-2021-42013",
+    "aliases": ["Apache 2.4.50 path traversal", "incomplete fix of CVE-2021-41773"],
+    "affected_versions": "Apache HTTP Server 2.4.49, 2.4.50",
+    "preconditions": "需要 Alias 类映射把 URL 指到受保护目录之外；默认 require all denied 可能阻止；若同时启用 CGI/mod_cgi 才可能 RCE。不是“版本=必可打”。",
+    "exploit_notes": "公开资料指向路径规范化绕过。检索工具不执行 PoC。优先看官方 Nuclei 模板和 Vulhub 环境说明。",
+    "tags": ["path-traversal", "httpd", "ctf-web"],
+    "verification": "static_review",
+    "evidence": "对照 NVD/厂商公告与 nuclei-templates http/cves/2021/CVE-2021-42013.yaml 路径，未在本机执行利用。",
+    "lab": "none",
+    "reviewer": "ctf-kb-mvp",
+    "updated_at": "2026-11-12T00:00:00Z"
+  },
+  {
+    "cve_id": "CVE-2021-41773",
+    "aliases": ["Apache 2.4.49 path traversal"],
+    "affected_versions": "Apache HTTP Server 2.4.49",
+    "preconditions": "仅 2.4.49。需要 Alias 类配置且目标文件未被 require all denied 挡住；CGI 开启时才可能 RCE。2.4.50 的修复不完整，见 CVE-2021-42013。",
+    "exploit_notes": "与 CVE-2021-42013 成对出现。存在 PoC 链接不等于当前目标可利用。",
+    "tags": ["path-traversal", "httpd", "ctf-web"],
+    "verification": "static_review",
+    "evidence": "静态对照公告与 Vulhub httpd/CVE-2021-41773 目录，未执行利用。",
+    "lab": "none",
+    "reviewer": "ctf-kb-mvp"
+  },
+  {
+    "cve_id": "CVE-2021-44228",
+    "aliases": ["Log4Shell", "Log4j RCE"],
+    "affected_versions": "Apache Log4j2 2.0-beta9 through 2.15.0（不含部分 security release）",
+    "preconditions": "需要 log4j-core，且攻击者能影响日志内容或参数；2.15.0 起默认关闭 lookup，2.16.0 起移除。不影响 log4net/log4cxx。",
+    "exploit_notes": "社区 PoC 极多且质量混杂，可能含恶意代码。优先用官方 Nuclei 与 Vulhub，不下载执行随机 GitHub PoC。",
+    "tags": ["jndi", "log4j", "rce"],
+    "verification": "unverified",
+    "evidence": "仅收录索引，未本地复现。",
+    "lab": "none",
+    "reviewer": "ctf-kb-mvp"
+  },
+  {
+    "cve_id": "CVE-2017-5638",
+    "aliases": ["Struts2 S2-045", "Content-Type OGNL"],
+    "affected_versions": "Apache Struts 2.3.x before 2.3.32, 2.5.x before 2.5.10.1",
+    "preconditions": "Jakarta Multipart 解析器；攻击面在 Content-Type / Content-Disposition / Content-Length。需要目标使用受影响 Struts 文件上传栈。",
+    "tags": ["ognl", "struts", "rce"],
+    "verification": "unverified",
+    "reviewer": "ctf-kb-mvp"
+  },
+  {
+    "cve_id": "CVE-2014-6271",
+    "aliases": ["Shellshock"],
+    "affected_versions": "GNU Bash through 4.3",
+    "preconditions": "需要能把环境变量传到 Bash（常见：Apache mod_cgi、部分 DHCP 客户端、sshd ForceCommand 等）。不是“有 Bash 就能打”。",
+    "tags": ["bash", "cgi", "rce"],
+    "verification": "unverified",
+    "reviewer": "ctf-kb-mvp"
+  },
+  {
+    "cve_id": "CVE-2022-22965",
+    "aliases": ["Spring4Shell"],
+    "affected_versions": "Spring MVC/WebFlux on JDK 9+",
+    "preconditions": "公开利用路径通常要求 Tomcat WAR 部署；Spring Boot 可执行 jar 默认不受该特定利用影响。版本匹配不够，必须看部署方式。",
+    "tags": ["spring", "rce", "data-binding"],
+    "verification": "unverified",
+    "reviewer": "ctf-kb-mvp"
+  }
+]
